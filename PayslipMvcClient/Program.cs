@@ -3,6 +3,12 @@ using PayslipMvcClient.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddHttpClient("PayslipApi", client =>
 {
@@ -10,7 +16,6 @@ builder.Services.AddHttpClient("PayslipApi", client =>
 })
 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
 {
-    // Para lang sa local development SSL certificate sa localhost:44395
     ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
 });
 
@@ -26,11 +31,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthorization();
 
+// Mao ni ang una mo-view inig run: Home/Index
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Payslip}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

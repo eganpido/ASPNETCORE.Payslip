@@ -1,8 +1,135 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model PayslipMvcClient.Models.LoginCodeViewModel
+@{
+    ViewData["Title"] = "Mobile Code Login";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    .login-shell {
+        min-height: calc(100dvh - 140px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-top: 1rem;
+        padding-bottom: 1.5rem;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 440px;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 1.15rem;
+        overflow: hidden;
+        background-color: #fff;
+    }
+
+    .login-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #0f766e 100%);
+        color: #fff;
+    }
+
+    /* Phones & small screens */
+    @@media (max-width: 575.98px) {
+        .login-shell {
+            min-height: auto;
+            align-items: flex-start;
+            padding-top: 0.75rem;
+            padding-left: 0.35rem;
+            padding-right: 0.35rem;
+        }
+
+        .login-header,
+        .login-card .card-body {
+            padding: 1.15rem !important;
+        }
+
+        .form-control,
+        .btn {
+            min-height: 48px;
+            font-size: 16px; /* Prevents iOS Safari auto-zoom on focus */
+        }
+    }
+
+    /* Extra small phones (320px - 359px) */
+    @@media (max-width: 359.98px) {
+        .login-header,
+        .login-card .card-body {
+            padding: 0.95rem !important;
+        }
+    }
+
+    /* Landscape mobile devices */
+    @@media (max-height: 480px) and (orientation: landscape) {
+        .login-shell {
+            min-height: auto;
+            padding-top: 0.5rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .login-header {
+            padding: 0.9rem 1.25rem !important;
+        }
+
+        .login-card .card-body {
+            padding: 1rem 1.25rem !important;
+        }
+    }
+</style>
+
+<div class="container login-shell">
+    <div class="card login-card shadow-sm">
+        <div class="login-header p-4 text-center">
+            <span class="badge bg-light text-dark mb-2">WHRIS Mobile</span>
+            <h1 class="h4 fw-bold mb-1">Welcome</h1>
+            <p class="small text-white-50 mb-0">Enter your Mobile Code to continue.</p>
+        </div>
+
+        <div class="card-body p-4">
+            <form id="loginCodeForm" asp-action="Index" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label asp-for="Code" class="form-label fw-semibold small text-uppercase text-muted"></label>
+                    <input asp-for="Code"
+                           type="text"
+                           autocomplete="off"
+                           autocapitalize="characters"
+                           spellcheck="false"
+                           enterkeyhint="go"
+                           class="form-control"
+                           placeholder="Enter Mobile Code (e.g. 123456)" />
+                    <span asp-validation-for="Code" class="text-danger small"></span>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                {
+                    <div class="alert alert-warning py-2 px-3 small rounded-3" role="alert">
+                        @Model.ErrorMessage
+                    </div>
+                }
+
+                <div class="d-grid mt-3">
+                    <button id="continueLoginBtn" type="submit" class="btn btn-primary fw-semibold">
+                        Continue
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('loginCodeForm');
+        const btn = document.getElementById('continueLoginBtn');
+        if (form && btn) {
+            form.addEventListener('submit', function () {
+                btn.disabled = true;
+                btn.textContent = 'Verifying...';
+            });
+        }
+    });
+</script>

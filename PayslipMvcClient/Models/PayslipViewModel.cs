@@ -1,15 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace PayslipMvcClient.Models
 {
     public class PayslipViewModel
     {
-        [Display(Name = "Payroll ID")]
-        public int PayrollId { get; set; }
-
-        [Display(Name = "Mobile Code")]
         public string Code { get; set; } = string.Empty;
+
+        [Display(Name = "Payroll Number")]
+        public int SelectedPayrollId { get; set; }
+
+        public List<SelectListItem> PayrollOptions { get; set; } = new();
 
         public string? ErrorMessage { get; set; }
 

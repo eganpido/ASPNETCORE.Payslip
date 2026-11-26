@@ -1,135 +1,253 @@
 ﻿@model PayslipMvcClient.Models.LoginCodeViewModel
 @{
     ViewData["Title"] = "Mobile Code Login";
+    Layout = null;
 }
-
-<style>
-    html {
-        -webkit-text-size-adjust: 100%;
-    }
-
-    .login-shell {
-        min-height: calc(100dvh - 140px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding-top: 1rem;
-        padding-bottom: 1.5rem;
-    }
-
-    .login-card {
-        width: 100%;
-        max-width: 440px;
-        border: 1px solid rgba(15, 23, 42, 0.08);
-        border-radius: 1.15rem;
-        overflow: hidden;
-        background-color: #fff;
-    }
-
-    .login-header {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #0f766e 100%);
-        color: #fff;
-    }
-
-    /* Phones & small screens */
-    @@media (max-width: 575.98px) {
-        .login-shell {
-            min-height: auto;
-            align-items: flex-start;
-            padding-top: 0.75rem;
-            padding-left: 0.35rem;
-            padding-right: 0.35rem;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-app: #121212;
+            --bg-card: #1c1e21;
+            --bg-input: #141618;
+            --border-dark: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-muted-dark: #9ca3af;
+            --accent-green: #10b981;
+            --accent-green-hover: #059669;
         }
 
-        .login-header,
-        .login-card .card-body {
-            padding: 1.15rem !important;
+        * {
+            box-sizing: border-box;
         }
 
-        .form-control,
-        .btn {
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif !important;
+            background-color: var(--bg-app) !important;
+            color: var(--text-primary) !important;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .login-wrap {
+            min-height: 100dvh;
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+            padding: 1rem 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-panel {
+            width: 100%;
+            min-width: 0;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            border-radius: 1.15rem;
+            overflow: hidden;
+        }
+
+        .login-banner {
+            background: linear-gradient(135deg, #198754 0%, #10b981 60%, #059669 100%);
+            padding: 1.35rem 1.25rem;
+            color: #ffffff;
+        }
+
+        .login-badge {
+            display: inline-block;
+            background-color: rgba(0, 0, 0, 0.25);
+            color: #ecfdf5;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.22rem 0.65rem;
+            border-radius: 999px;
+            margin-bottom: 0.45rem;
+        }
+
+        .login-title {
+            font-size: clamp(1.2rem, 4.5vw, 1.45rem);
+            font-weight: 700;
+            margin: 0 0 0.2rem;
+            line-height: 1.2;
+        }
+
+        .login-subtitle {
+            font-size: clamp(0.75rem, 2.8vw, 0.82rem);
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .login-body {
+            padding: 1.35rem 1.25rem;
+        }
+
+        .code-label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted-dark);
+            margin-bottom: 0.45rem;
+        }
+
+        .code-input {
+            width: 100%;
             min-height: 48px;
-            font-size: 16px; /* Prevents iOS Safari auto-zoom on focus */
-        }
-    }
-
-    /* Extra small phones (320px - 359px) */
-    @@media (max-width: 359.98px) {
-        .login-header,
-        .login-card .card-body {
-            padding: 0.95rem !important;
-        }
-    }
-
-    /* Landscape mobile devices */
-    @@media (max-height: 480px) and (orientation: landscape) {
-        .login-shell {
-            min-height: auto;
-            padding-top: 0.5rem;
-            padding-bottom: 0.75rem;
+            background-color: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border-dark);
+            border-radius: 0.7rem;
+            padding: 0.65rem 0.85rem;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
         }
 
-        .login-header {
-            padding: 0.9rem 1.25rem !important;
+            .code-input:focus {
+                outline: none;
+                border-color: var(--accent-green);
+                box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.22);
+            }
+
+        .btn-continue {
+            width: 100%;
+            min-height: 48px;
+            margin-top: 1rem;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            border: 0;
+            border-radius: 0.7rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: background 0.15s ease;
         }
 
-        .login-card .card-body {
-            padding: 1rem 1.25rem !important;
+            .btn-continue:hover {
+                background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            }
+
+        .alert-login-warn {
+            background-color: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            color: #fde68a;
+            border-radius: 0.7rem;
+            padding: 0.65rem 0.8rem;
+            font-size: 0.78rem;
+            margin-top: 0.75rem;
+            overflow-wrap: anywhere;
         }
-    }
-</style>
 
-<div class="container login-shell">
-    <div class="card login-card shadow-sm">
-        <div class="login-header p-4 text-center">
-            <span class="badge bg-light text-dark mb-2">WHRIS Mobile</span>
-            <h1 class="h4 fw-bold mb-1">Welcome</h1>
-            <p class="small text-white-50 mb-0">Enter your Mobile Code to continue.</p>
-        </div>
+        .validation-msg {
+            display: block;
+            color: #f87171;
+            font-size: 0.75rem;
+            margin-top: 0.35rem;
+        }
 
-        <div class="card-body p-4">
-            <form id="loginCodeForm" asp-action="Index" method="post">
-                @Html.AntiForgeryToken()
+        /* Tablets & larger viewports */
+        @@media (min-width: 768px) {
+            .login-wrap {
+                max-width: 460px;
+                padding: 1.5rem 1rem;
+            }
+        }
 
-                <div class="mb-3">
-                    <label asp-for="Code" class="form-label fw-semibold small text-uppercase text-muted"></label>
+        /* Very small phones (<= 360px) */
+        @@media (max-width: 360px) {
+            .login-wrap {
+                padding: 0.75rem 0.65rem;
+            }
+
+            .login-banner,
+            .login-body {
+                padding: 1rem 0.95rem;
+            }
+        }
+
+        /* Landscape mobile devices */
+        @@media (max-height: 480px) and (orientation: landscape) {
+            .login-wrap {
+                min-height: auto;
+                padding-top: 0.75rem;
+                padding-bottom: 1rem;
+            }
+
+            .login-banner {
+                padding: 0.95rem 1.15rem;
+            }
+
+            .login-body {
+                padding: 1rem 1.15rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrap">
+        <div class="login-panel">
+            <div class="login-banner">
+                <span class="login-badge">WHRIS Mobile</span>
+                <h1 class="login-title">Welcome</h1>
+                <p class="login-subtitle">Enter your Mobile Code to continue.</p>
+            </div>
+
+            <div class="login-body">
+                <form id="loginCodeForm" asp-action="Index" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <label asp-for="Code" class="code-label"></label>
                     <input asp-for="Code"
                            type="text"
                            autocomplete="off"
                            autocapitalize="characters"
                            spellcheck="false"
                            enterkeyhint="go"
-                           class="form-control"
+                           class="code-input"
                            placeholder="Enter Mobile Code (e.g. 123456)" />
-                    <span asp-validation-for="Code" class="text-danger small"></span>
-                </div>
+                    <span asp-validation-for="Code" class="validation-msg"></span>
 
-                @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
-                {
-                    <div class="alert alert-warning py-2 px-3 small rounded-3" role="alert">
-                        @Model.ErrorMessage
-                    </div>
-                }
+                    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                    {
+                        <div class="alert-login-warn" role="alert">
+                            @Model.ErrorMessage
+                        </div>
+                    }
 
-                <div class="d-grid mt-3">
-                    <button id="continueLoginBtn" type="submit" class="btn btn-primary fw-semibold">
+                    <button id="continueLoginBtn" type="submit" class="btn-continue">
                         Continue
                     </button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('loginCodeForm');
-        const btn = document.getElementById('continueLoginBtn');
-        if (form && btn) {
-            form.addEventListener('submit', function () {
-                btn.disabled = true;
-                btn.textContent = 'Verifying...';
-            });
-        }
-    });
-</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('loginCodeForm');
+            const btn = document.getElementById('continueLoginBtn');
+            if (form && btn) {
+                form.addEventListener('submit', function () {
+                    btn.disabled = true;
+                    btn.textContent = 'Verifying...';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

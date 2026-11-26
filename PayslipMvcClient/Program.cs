@@ -12,7 +12,7 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddHttpClient("PayslipApi", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:44395/");
+    client.BaseAddress = new Uri("http://streetsmart-001-site1.gtempurl.com//");
 })
 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
 {

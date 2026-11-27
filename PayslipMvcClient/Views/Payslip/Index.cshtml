@@ -1,6 +1,6 @@
 ﻿@model PayslipMvcClient.Models.PayslipViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Employee Portal";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -360,7 +360,7 @@
     <div class="payslip-shell">
         <!-- Top Header -->
         <div class="top-bar">
-            <h1 class="page-title">Payslips</h1>
+            <h1 class="page-title">Payslip</h1>
             <a asp-controller="Home" asp-action="Index" class="btn-logoff">Log-off</a>
         </div>
 
@@ -422,12 +422,63 @@
                     <div class="ledger-amount">₱@item.BasicSalary.ToString("N2")</div>
                 </div>
 
-                <div class="ledger-row">
-                    <div class="ledger-label-wrap">
-                        <div class="ledger-title">Overtime / Other Salary</div>
+                <div class="ledger-row" style="display: block;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+                        <div class="ledger-label-wrap">
+                            <div class="ledger-title">Other Salary (OT/Holiday)</div>
+                        </div>
+                        <div class="ledger-amount">₱@item.OtherSalary.ToString("N2")</div>
                     </div>
-                    <div class="ledger-amount">₱@item.OtherSalary.ToString("N2")</div>
+
+                    <div style="margin-top: 0.7rem; padding: 0.65rem 0.75rem; background-color: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 0.65rem; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.76rem; font-variant-numeric: tabular-nums;">
+                            <thead>
+                                <tr style="color: #9ca3af; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                                    <th style="text-align: left; font-weight: 600; padding: 0.2rem 0.25rem 0.4rem;">Breakdown</th>
+                                    <th style="text-align: center; font-weight: 600; padding: 0.2rem 0.25rem 0.4rem;">Hr(s)</th>
+                                    <th style="text-align: right; font-weight: 600; padding: 0.2rem 0.25rem 0.4rem;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody style="color: #e5e7eb;">
+                                <tr style="border-bottom: 1px dashed rgba(255, 255, 255, 0.06);">
+                                    <td style="padding: 0.35rem 0.25rem;">Legal Holiday</td>
+                                    <td style="text-align: center; padding: 0.35rem 0.25rem; color: #9ca3af;">@item.TotalLegalHolidayWorkingHours.ToString("N2")</td>
+                                    <td style="text-align: right; padding: 0.35rem 0.25rem;">₱@item.TotalLegalHolidayWorkingAmount.ToString("N2")</td>
+                                </tr>
+                                <tr style="border-bottom: 1px dashed rgba(255, 255, 255, 0.06);">
+                                    <td style="padding: 0.35rem 0.25rem;">Special Holiday</td>
+                                    <td style="text-align: center; padding: 0.35rem 0.25rem; color: #9ca3af;">@item.TotalSpecialHolidayWorkingHours.ToString("N2")</td>
+                                    <td style="text-align: right; padding: 0.35rem 0.25rem;">₱@item.TotalSpecialHolidayWorkingAmount.ToString("N2")</td>
+                                </tr>
+                                <tr style="border-bottom: 1px dashed rgba(255, 255, 255, 0.06);">
+                                    <td style="padding: 0.35rem 0.25rem;">Night Diff</td>
+                                    <td style="text-align: center; padding: 0.35rem 0.25rem; color: #9ca3af;">@item.TotalRegularNightHours.ToString("N2")</td>
+                                    <td style="text-align: right; padding: 0.35rem 0.25rem;">₱@item.TotalRegularNightAmount.ToString("N2")</td>
+                                </tr>
+                                <tr style="border-bottom: 1px dashed rgba(255, 255, 255, 0.06);">
+                                    <td style="padding: 0.35rem 0.25rem;">Overtime</td>
+                                    <td style="text-align: center; padding: 0.35rem 0.25rem; color: #9ca3af;">@item.TotalRegularOvertimeHours.ToString("N2")</td>
+                                    <td style="text-align: right; padding: 0.35rem 0.25rem;">₱@item.TotalRegularOvertimeAmount.ToString("N2")</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.35rem 0.25rem;">Restday</td>
+                                    <td style="text-align: center; padding: 0.35rem 0.25rem; color: #9ca3af;">@item.TotalRegularRestdayHours.ToString("N2")</td>
+                                    <td style="text-align: right; padding: 0.35rem 0.25rem;">₱@item.ComputedRegularRestdayAmount.ToString("N2")</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
+                @if (item.TotalOtherIncomeTaxable != 0)
+                {
+                    <div class="ledger-row">
+                        <div class="ledger-label-wrap">
+                            <div class="ledger-title">Other Taxable Income</div>
+                        </div>
+                        <div class="ledger-amount">₱@item.TotalOtherIncomeTaxable.ToString("N2")</div>
+                    </div>
+                }
 
                 @if (item.TotalOtherIncomeNonTaxable != 0)
                 {
@@ -461,28 +512,28 @@
                     <div class="ledger-label-wrap">
                         <div class="ledger-title">Income Tax</div>
                     </div>
-                    <div class="ledger-amount deduction">-₱@item.Tax.ToString("N2")</div>
+                    <div class="ledger-amount deduction">(₱@item.Tax.ToString("N2"))</div>
                 </div>
 
                 <div class="ledger-row">
                     <div class="ledger-label-wrap">
                         <div class="ledger-title">SSS</div>
                     </div>
-                    <div class="ledger-amount deduction">-₱@item.SSSContribution.ToString("N2")</div>
+                    <div class="ledger-amount deduction">(₱@item.SSSContribution.ToString("N2"))</div>
                 </div>
 
                 <div class="ledger-row">
                     <div class="ledger-label-wrap">
                         <div class="ledger-title">PhilHealth</div>
                     </div>
-                    <div class="ledger-amount deduction">-₱@item.PHICContribution.ToString("N2")</div>
+                    <div class="ledger-amount deduction">(₱@item.PHICContribution.ToString("N2"))</div>
                 </div>
 
                 <div class="ledger-row">
                     <div class="ledger-label-wrap">
                         <div class="ledger-title">HDMF (Pag-IBIG)</div>
                     </div>
-                    <div class="ledger-amount deduction">-₱@item.HDMFContribution.ToString("N2")</div>
+                    <div class="ledger-amount deduction">(₱@item.HDMFContribution.ToString("N2"))</div>
                 </div>
 
                 @if (item.TotalOtherDeduction != 0)
@@ -491,7 +542,7 @@
                         <div class="ledger-label-wrap">
                             <div class="ledger-title">Other Deductions</div>
                         </div>
-                        <div class="ledger-amount deduction">-₱@item.TotalOtherDeduction.ToString("N2")</div>
+                        <div class="ledger-amount deduction">(₱@item.TotalOtherDeduction.ToString("N2"))</div>
                     </div>
                 }
 
@@ -501,7 +552,7 @@
                         <div class="ledger-label-wrap">
                             <div class="ledger-title">Tardy</div>
                         </div>
-                        <div class="ledger-amount deduction">-₱@item.TotalTardyAmount.ToString("N2")</div>
+                        <div class="ledger-amount deduction">(₱@item.TotalTardyAmount.ToString("N2"))</div>
                     </div>
                 }
 
@@ -511,7 +562,7 @@
                         <div class="ledger-label-wrap">
                             <div class="ledger-title">Absent</div>
                         </div>
-                        <div class="ledger-amount deduction">-₱@item.TotalAbsentAmount.ToString("N2")</div>
+                        <div class="ledger-amount deduction">(₱@item.TotalAbsentAmount.ToString("N2"))</div>
                     </div>
                 }
 
@@ -519,11 +570,17 @@
                     <div class="ledger-label-wrap">
                         <div class="ledger-title">Total Deductions</div>
                     </div>
-                    <div class="ledger-amount deductions-total">-₱@totalAllDeductions.ToString("N2")</div>
+                    <div class="ledger-amount deductions-total">(₱@totalAllDeductions.ToString("N2"))</div>
                 </div>
             </div>
 
             <!-- Optional Breakdowns -->
+            @if (!string.IsNullOrWhiteSpace(item.OtherIncomeNonTaxableBreakdown))
+            {
+                <div class="section-heading">Non-Taxable Income Breakdown</div>
+                <div class="breakdown-panel">@Html.Raw(item.OtherIncomeNonTaxableBreakdown)</div>
+            }
+
             @if (!string.IsNullOrWhiteSpace(item.OtherDeductionBreakdown))
             {
                 <div class="section-heading">Other Deductions Breakdown</div>

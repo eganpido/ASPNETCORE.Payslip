@@ -21,6 +21,7 @@ namespace PayslipMvcClient.Models
     {
         public bool IsLocked { get; set; }
         public int PayrollId { get; set; }
+        public int PayrollOtherDeductionId { get; set; }
         public string? PayrollNumber { get; set; }
         public DateTime? PayrollDate { get; set; }
         public string? Remarks { get; set; }
@@ -32,6 +33,14 @@ namespace PayslipMvcClient.Models
         public decimal TotalSalaryAmount { get; set; }
         public decimal TotalTardyAmount { get; set; }
         public decimal TotalAbsentAmount { get; set; }
+        public decimal TotalNetSalaryAmount { get; set; }
+        public decimal TotalLegalHolidayWorkingAmount { get; set; }
+        public decimal TotalSpecialHolidayWorkingAmount { get; set; }
+        public decimal TotalRegularNightAmount { get; set; }
+        public decimal TotalRegularOvertimeAmount { get; set; }
+        public decimal ComputedRegularRestdayAmount { get; set; }
+        public decimal LoanBalances { get; set; }
+        public decimal TotalOtherIncomeTaxable { get; set; }
         public decimal GrossIncome { get; set; }
         public decimal TotalOtherIncomeNonTaxable { get; set; }
         public decimal GrossIncomeWithNonTaxable { get; set; }
@@ -41,13 +50,18 @@ namespace PayslipMvcClient.Models
         public decimal Tax { get; set; }
         public decimal TotalDeduction { get; set; }
         public decimal TotalOtherDeduction { get; set; }
-        public decimal NetIncome { get; set; }
-        public decimal TotalWorkingHours { get; set; }
         public string? OtherDeductionBreakdown { get; set; }
+        public decimal NetIncome { get; set; }
+        public int PreparedBy { get; set; }
+        public decimal TotalWorkingHours { get; set; }
+        public decimal TotalLegalHolidayWorkingHours { get; set; }
+        public decimal TotalSpecialHolidayWorkingHours { get; set; }
+        public decimal TotalRegularNightHours { get; set; }
+        public decimal TotalRegularRestdayHours { get; set; }
+        public decimal TotalRegularOvertimeHours { get; set; }
+        public string? LeaveBalanceBreakdown { get; set; }
         public string? OtherIncomeNonTaxableBreakdown { get; set; }
         public string? LoanBalancesBreakdown { get; set; }
-        public decimal LoanBalances { get; set; }
-        public string? LeaveBalanceBreakdown { get; set; }
         public string? OtBreakdown { get; set; }
     }
 }

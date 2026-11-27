@@ -3,47 +3,356 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - PayslipMvcClient</title>
+    <title>@ViewData["Title"] - Streetsmart Computer Solutions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/PayslipMvcClient.styles.css" asp-append-version="true" />
+    <style>
+        :root {
+            --bg-app: #121212;
+            --bg-surface: #181a1d;
+            --bg-card: #1c1e21;
+            --border-dark: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-muted-dark: #9ca3af;
+            --accent-emerald: #10b981;
+            --accent-emerald-soft: #34d399;
+            --sidebar-width: 260px;
+            --font-poppins: 'Poppins', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: var(--font-poppins);
+        }
+
+        html,
+        body,
+        button,
+        input,
+        select,
+        textarea,
+        a,
+        div,
+        span,
+        p,
+        h1, h2, h3, h4, h5, h6,
+        ul, li, footer, header, aside, main {
+            font-family: var(--font-poppins) !important;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            background-color: var(--bg-app);
+            color: var(--text-primary);
+            margin: 0;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Top Bar */
+        .app-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            height: 60px;
+            background-color: rgba(24, 26, 29, 0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-dark);
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 0;
+        }
+
+        .burger-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 0.65rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-dark);
+            color: var(--text-primary);
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+        }
+
+            .burger-btn:hover {
+                background-color: #24272c;
+                border-color: rgba(16, 185, 129, 0.45);
+            }
+
+        .burger-line {
+            width: 17px;
+            height: 2px;
+            border-radius: 2px;
+            background-color: var(--text-primary);
+        }
+
+        .app-brand {
+            font-size: clamp(0.92rem, 3.2vw, 1.05rem);
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .brand-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: var(--accent-emerald);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.75);
+            flex-shrink: 0;
+        }
+
+        /* Collapsible Sidebar */
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1040;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+            .sidebar-backdrop.show {
+                opacity: 1;
+                visibility: visible;
+            }
+
+        .app-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            max-width: 82vw;
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-dark);
+            z-index: 1050;
+            transform: translateX(-100%);
+            transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+            .app-sidebar.open {
+                transform: translateX(0);
+            }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 0.9rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .sidebar-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-emerald-soft);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .sidebar-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 0.5rem;
+            background: transparent;
+            border: 1px solid var(--border-dark);
+            color: var(--text-muted-dark);
+            font-size: 1rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+            .sidebar-close:hover {
+                color: var(--text-primary);
+                border-color: rgba(255, 255, 255, 0.2);
+            }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.7rem 0.85rem;
+            border-radius: 0.7rem;
+            color: #e5e7eb;
+            text-decoration: none;
+            font-size: 0.86rem;
+            font-weight: 500;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+            .sidebar-link:hover {
+                background-color: rgba(16, 185, 129, 0.12);
+                color: var(--accent-emerald-soft);
+            }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 0.85rem;
+            border-top: 1px solid var(--border-dark);
+            font-size: 0.72rem;
+            color: var(--text-muted-dark);
+        }
+
+        /* Main Area */
+        .app-main-wrap {
+            flex: 1 0 auto;
+            width: 100%;
+            padding: 1rem 0.75rem 1.5rem;
+        }
+
+        /* Footer */
+        .app-footer {
+            flex-shrink: 0;
+            background-color: var(--bg-surface);
+            border-top: 1px solid var(--border-dark);
+            padding: 0.9rem 1rem;
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-muted-dark);
+        }
+
+        @@media (min-width: 768px) {
+            .app-main-wrap {
+                padding: 1.5rem 1.25rem 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PayslipMvcClient</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+    <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
+
+    <aside id="appSidebar" class="app-sidebar" aria-label="Main Navigation">
+        <div class="sidebar-header">
+            <h2 class="sidebar-title">Menu</h2>
+            <button type="button" class="sidebar-close" aria-label="Close menu" onclick="toggleSidebar(false)">&times;</button>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li>
+                <a class="sidebar-link" asp-area="" asp-controller="Payslip" asp-action="Index" onclick="toggleSidebar(false)">
+                    <span>Payslip</span>
+                </a>
+            </li>
+            <li>
+                <a class="sidebar-link" asp-area="" asp-controller="Home" asp-action="Index" onclick="toggleSidebar(false)">
+                    <span>Daily Time Record</span>
+                </a>
+            </li>
+            <li>
+                <a class="sidebar-link" asp-area="" asp-controller="Home" asp-action="Index" onclick="toggleSidebar(false)">
+                    <span>Memo</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            Streetsmart Computer Solutions v1.0.1
+        </div>
+    </aside>
+
+    <header class="app-topbar">
+        <div class="topbar-left">
+            <button type="button"
+                    class="burger-btn"
+                    aria-label="Toggle navigation menu"
+                    aria-controls="appSidebar"
+                    aria-expanded="false"
+                    onclick="toggleSidebar()">
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+            </button>
+
+            <a class="app-brand" asp-area="" asp-controller="Payslip" asp-action="Index">
+                <span class="brand-dot"></span>
+                <span>Employee Portal</span>
+            </a>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <div class="app-main-wrap">
+        <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - PayslipMvcClient - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+    <footer class="app-footer">
+        &copy; 2026 Streetsmart Computer Solutions v1.0.1
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        function toggleSidebar(forceState) {
+            const sidebar = document.getElementById('appSidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const burger = document.querySelector('.burger-btn');
+            if (!sidebar || !backdrop) return;
+
+            const shouldOpen = typeof forceState === 'boolean'
+                ? forceState
+                : !sidebar.classList.contains('open');
+
+            sidebar.classList.toggle('open', shouldOpen);
+            backdrop.classList.toggle('show', shouldOpen);
+            if (burger) {
+                burger.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+            }
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                toggleSidebar(false);
+            }
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -4,9 +4,11 @@ using PayslipMvcClient.Models;
 
 namespace PayslipMvcClient.Controllers
 {
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class HomeController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private const string SessionMobileCodeKey = "MobileCode";
 
         public HomeController(IHttpClientFactory httpClientFactory)
         {
@@ -16,8 +18,20 @@ namespace PayslipMvcClient.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var savedCode = HttpContext.Session.GetString("MobileCode") ?? string.Empty;
-            return View(new LoginCodeViewModel { Code = savedCode });
+            // Clear session whenever user returns to login / logs off
+            HttpContext.Session.Remove(SessionMobileCodeKey);
+            HttpContext.Session.Clear();
+
+            return View(new LoginCodeViewModel());
+        }
+
+        [HttpGet]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Remove(SessionMobileCodeKey);
+            HttpContext.Session.Clear();
+
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
@@ -47,12 +61,13 @@ namespace PayslipMvcClient.Controllers
 
                 if (!IsValidLoginResponse(rawJson))
                 {
+                    HttpContext.Session.Remove(SessionMobileCodeKey);
                     model.ErrorMessage = "Invalid Mobile Code or no matching account found.";
                     return View(model);
                 }
 
-                HttpContext.Session.SetString("MobileCode", cleanCode);
-                return RedirectToAction("Index", "Payslip", new { code = cleanCode });
+                HttpContext.Session.SetString(SessionMobileCodeKey, cleanCode);
+                return RedirectToAction("Index", "Payslip");
             }
             catch (Exception ex)
             {

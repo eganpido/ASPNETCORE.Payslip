@@ -6,9 +6,11 @@ using PayslipMvcClient.Models;
 
 namespace PayslipMvcClient.Controllers
 {
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class PayslipController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private const string SessionMobileCodeKey = "MobileCode";
 
         public PayslipController(IHttpClientFactory httpClientFactory)
         {
@@ -16,15 +18,13 @@ namespace PayslipMvcClient.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string? code)
+        public async Task<IActionResult> Index()
         {
-            string activeCode = !string.IsNullOrWhiteSpace(code)
-                ? code.Trim()
-                : (HttpContext.Session.GetString("MobileCode") ?? string.Empty);
+            string activeCode = HttpContext.Session.GetString(SessionMobileCodeKey) ?? string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(activeCode))
+            if (string.IsNullOrWhiteSpace(activeCode))
             {
-                HttpContext.Session.SetString("MobileCode", activeCode);
+                return RedirectToAction("Index", "Home");
             }
 
             var model = new PayslipViewModel
@@ -32,15 +32,10 @@ namespace PayslipMvcClient.Controllers
                 Code = activeCode
             };
 
-            if (string.IsNullOrWhiteSpace(model.Code))
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            // 1. Load Payroll Numbers (pinaka-latest ang ma-select by default)
+            // 1. Load Payroll Numbers (latest is selected by default)
             await LoadPayrollDropdownAsync(model);
 
-            // 2. Fetch lahos ang payslip para sa default/latest Payroll Number
+            // 2. Auto-fetch the payslip for the default/latest Payroll Number
             if (model.SelectedPayrollId > 0)
             {
                 await LoadPayslipRecordsAsync(model);
@@ -53,16 +48,14 @@ namespace PayslipMvcClient.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(PayslipViewModel model)
         {
-            string activeCode = !string.IsNullOrWhiteSpace(model.Code)
-                ? model.Code.Trim()
-                : (HttpContext.Session.GetString("MobileCode") ?? string.Empty);
+            string activeCode = HttpContext.Session.GetString(SessionMobileCodeKey) ?? string.Empty;
 
-            model.Code = activeCode;
-
-            if (string.IsNullOrWhiteSpace(model.Code))
+            if (string.IsNullOrWhiteSpace(activeCode))
             {
                 return RedirectToAction("Index", "Home");
             }
+
+            model.Code = activeCode;
 
             await LoadPayrollDropdownAsync(model, preserveSelectedId: model.SelectedPayrollId);
 
@@ -122,7 +115,6 @@ namespace PayslipMvcClient.Controllers
                 }
                 else if (options.Count > 0 && int.TryParse(options[0].Value, out int latestId))
                 {
-                    // Latest payroll number (first item in the list) is selected by default
                     model.SelectedPayrollId = latestId;
                 }
                 else
@@ -142,12 +134,55 @@ namespace PayslipMvcClient.Controllers
             if (string.IsNullOrWhiteSpace(rawJson)) return list;
 
             using var doc = JsonDocument.Parse(rawJson);
-            if (doc.RootElement.ValueKind != JsonValueKind.Array) return list;
+            var root = doc.RootElement;
 
-            foreach (var item in doc.RootElement.EnumerateArray())
+            JsonElement arrayElement = root;
+            if (root.ValueKind == JsonValueKind.Object)
+            {
+                if (root.TryGetProperty("Value", out var valProp) && valProp.ValueKind == JsonValueKind.Array)
+                {
+                    arrayElement = valProp;
+                }
+                else if (root.TryGetProperty("value", out var valPropLower) && valPropLower.ValueKind == JsonValueKind.Array)
+                {
+                    arrayElement = valPropLower;
+                }
+                else
+                {
+                    return list;
+                }
+            }
+
+            if (arrayElement.ValueKind != JsonValueKind.Array) return list;
+
+            foreach (var item in arrayElement.EnumerateArray())
             {
                 string value = GetStringProperty(item, "Id", "id", "PayrollId", "payrollId", "Value", "value");
-                string text = GetStringProperty(item, "PayrollNumber", "payrollNumber", "Number", "number", "Text", "text", "Label", "label");
+                string payrollNumber = GetStringProperty(item, "PayrollNumber", "payrollNumber", "Payrollnumber", "payrollnumber", "Number", "number").Trim();
+                string remarks = GetStringProperty(item, "Remarks", "remarks").Trim();
+
+                payrollNumber = payrollNumber.Trim('-', ' ');
+                remarks = remarks.Trim('-', ' ');
+
+                string text;
+                if (!string.IsNullOrWhiteSpace(payrollNumber) && !string.IsNullOrWhiteSpace(remarks))
+                {
+                    text = payrollNumber.Contains(remarks, StringComparison.OrdinalIgnoreCase)
+                        ? payrollNumber
+                        : $"{payrollNumber} - {remarks}";
+                }
+                else if (!string.IsNullOrWhiteSpace(payrollNumber))
+                {
+                    text = payrollNumber;
+                }
+                else if (!string.IsNullOrWhiteSpace(remarks))
+                {
+                    text = remarks;
+                }
+                else
+                {
+                    text = GetStringProperty(item, "Text", "text", "Label", "label");
+                }
 
                 if (string.IsNullOrWhiteSpace(value) && !string.IsNullOrWhiteSpace(text))
                     value = text;

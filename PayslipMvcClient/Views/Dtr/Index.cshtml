@@ -1,0 +1,613 @@
+﻿@model PayslipMvcClient.Models.DtrViewModel
+@{
+    ViewData["Title"] = "Daily Time Record";
+}
+
+<style>
+    :root {
+        --bg-card: #1c1e21;
+        --bg-card-elevated: #23262b;
+        --bg-total-row: #172a3a;
+        --border-dark: rgba(255, 255, 255, 0.08);
+        --text-primary: #f3f4f6;
+        --text-muted-dark: #9ca3af;
+        --accent-green: #22c55e;
+        --accent-green-soft: #4ade80;
+        --accent-emerald: #10b981;
+        --accent-emerald-soft: #34d399;
+        --warn-amber: #fbbf24;
+        --deduction-red: #f87171;
+    }
+
+    .dtr-shell {
+        width: 100%;
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 0.25rem 0.15rem 2rem;
+    }
+
+    .dtr-top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .dtr-title {
+        font-size: clamp(1.2rem, 4vw, 1.45rem);
+        font-weight: 600;
+        margin: 0;
+        color: var(--text-primary);
+    }
+
+    .btn-logoff {
+        background-color: var(--bg-card);
+        color: #e5e7eb;
+        border: 1px solid var(--border-dark);
+        border-radius: 999px;
+        padding: 0.38rem 0.85rem;
+        font-size: 0.76rem;
+        font-weight: 500;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+        .btn-logoff:hover {
+            background-color: var(--bg-card-elevated);
+            border-color: rgba(16, 185, 129, 0.35);
+            color: #fff;
+        }
+
+    .dtr-selector-wrap {
+        margin-bottom: 1rem;
+    }
+
+    .dtr-select-dark {
+        width: 100%;
+        min-height: 44px;
+        background-color: var(--bg-card);
+        color: #e5e7eb;
+        border: 1px solid var(--border-dark);
+        border-radius: 0.65rem;
+        padding: 0.6rem 2.2rem 0.6rem 0.75rem;
+        font-size: clamp(0.76rem, 2.8vw, 0.84rem);
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+    }
+
+        .dtr-select-dark:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+        }
+
+    .dtr-hero-card {
+        background: linear-gradient(135deg, #198754 0%, #10b981 55%, #059669 100%);
+        border-radius: 1.15rem;
+        padding: 1.2rem 1.25rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 12px 28px rgba(16, 185, 129, 0.16);
+        color: #ffffff;
+    }
+
+    .dtr-hero-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .dtr-hero-label {
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .dtr-badge {
+        background-color: rgba(0, 0, 0, 0.28);
+        color: #ecfdf5;
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.22rem 0.65rem;
+        border-radius: 0.45rem;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    .dtr-hero-hours {
+        font-size: clamp(1.6rem, 6.5vw, 2.2rem);
+        font-weight: 700;
+        line-height: 1.15;
+        font-variant-numeric: tabular-nums;
+        margin-bottom: 0.85rem;
+    }
+
+    .dtr-hero-divider {
+        border: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.28);
+        margin: 0 0 0.8rem;
+    }
+
+    .dtr-emp-name {
+        font-size: clamp(0.88rem, 3.2vw, 1rem);
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 0.15rem;
+    }
+
+    .dtr-emp-sub {
+        font-size: 0.74rem;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.88);
+        margin-bottom: 0.45rem;
+    }
+
+    .dtr-emp-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.92);
+    }
+
+    .dtr-section-heading {
+        font-size: 0.74rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted-dark);
+        margin: 0 0 0.65rem 0.15rem;
+    }
+
+    .dtr-summary-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-dark);
+        border-radius: 1rem;
+        overflow: hidden;
+        margin-bottom: 1.25rem;
+    }
+
+    .dtr-summary-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-dark);
+        font-size: 0.84rem;
+    }
+
+        .dtr-summary-row:last-child {
+            border-bottom: 0;
+        }
+
+        .dtr-summary-row.total-row {
+            background-color: var(--bg-total-row);
+            font-weight: 700;
+        }
+
+    .dtr-summary-val {
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+        .dtr-summary-val.accent {
+            color: var(--accent-green-soft);
+        }
+
+        .dtr-summary-val.warn {
+            color: var(--deduction-red);
+        }
+
+    /* Cooler Daily Logs Styling */
+    .dtr-entry-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .dtr-day-card {
+        background: linear-gradient(180deg, rgba(35, 38, 43, 0.94) 0%, rgba(28, 30, 33, 0.99) 100%);
+        border: 1px solid var(--border-dark);
+        border-left: 3px solid var(--accent-emerald);
+        border-radius: 1rem;
+        padding: 0.95rem 1rem;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+        transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+
+        .dtr-day-card:hover {
+            transform: translateY(-1px);
+            border-color: rgba(16, 185, 129, 0.35);
+            border-left-color: var(--accent-emerald-soft);
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.38);
+        }
+
+        .dtr-day-card.is-restday {
+            border-left-color: #38bdf8;
+        }
+
+        .dtr-day-card.is-absent {
+            border-left-color: var(--deduction-red);
+        }
+
+    .dtr-day-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding-bottom: 0.65rem;
+        margin-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        flex-wrap: wrap;
+    }
+
+    .dtr-date-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .dtr-date-text {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .dtr-weekday-pill {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--accent-emerald-soft);
+        background-color: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        padding: 0.14rem 0.55rem;
+        border-radius: 999px;
+    }
+
+    .dtr-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .dtr-tag {
+        font-size: 0.68rem;
+        font-weight: 600;
+        padding: 0.18rem 0.55rem;
+        border-radius: 999px;
+        background-color: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: #d1d5db;
+    }
+
+        .dtr-tag.rest {
+            background-color: rgba(56, 189, 248, 0.14);
+            border-color: rgba(56, 189, 248, 0.3);
+            color: #7dd3fc;
+        }
+
+        .dtr-tag.ob {
+            background-color: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--accent-emerald-soft);
+        }
+
+        .dtr-tag.leave {
+            background-color: rgba(251, 191, 36, 0.15);
+            border-color: rgba(251, 191, 36, 0.3);
+            color: #fcd34d;
+        }
+
+        .dtr-tag.absent {
+            background-color: rgba(248, 113, 113, 0.15);
+            border-color: rgba(248, 113, 113, 0.3);
+            color: #fca5a5;
+        }
+
+    .dtr-times-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.55rem;
+        font-size: 0.78rem;
+    }
+
+    @@media (min-width: 576px) {
+        .dtr-times-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+
+    .dtr-time-slot {
+        background-color: rgba(18, 18, 18, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 0.65rem;
+        padding: 0.45rem 0.6rem;
+    }
+
+    .dtr-slot-label {
+        color: var(--text-muted-dark);
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 0.1rem;
+    }
+
+    .dtr-slot-val {
+        color: var(--text-primary);
+        font-size: 0.78rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .dtr-metrics-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.7rem;
+        padding-top: 0.65rem;
+        border-top: 1px dashed rgba(255, 255, 255, 0.08);
+        font-size: 0.72rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .dtr-metric-chip {
+        background-color: rgba(255, 255, 255, 0.035);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 0.5rem;
+        padding: 0.22rem 0.5rem;
+        color: var(--text-muted-dark);
+    }
+
+        .dtr-metric-chip strong {
+            color: #e5e7eb;
+            font-weight: 600;
+        }
+
+        .dtr-metric-chip.ot-chip {
+            background-color: rgba(251, 191, 36, 0.12);
+            border-color: rgba(251, 191, 36, 0.28);
+            color: #fde68a;
+        }
+
+            .dtr-metric-chip.ot-chip strong {
+                color: #fbbf24;
+            }
+
+        .dtr-metric-chip.net-chip {
+            background-color: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.28);
+            color: #a7f3d0;
+        }
+
+            .dtr-metric-chip.net-chip strong {
+                color: var(--accent-emerald-soft);
+            }
+
+    .dtr-alert-warn {
+        background-color: rgba(245, 158, 11, 0.12);
+        border: 1px solid rgba(245, 158, 11, 0.35);
+        color: #fde68a;
+        border-radius: 0.85rem;
+        padding: 0.8rem 1rem;
+        font-size: 0.82rem;
+        margin-bottom: 1rem;
+    }
+
+    .dtr-remarks-box {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-dark);
+        border-radius: 0.85rem;
+        padding: 0.85rem 1rem;
+        font-size: 0.78rem;
+        color: var(--text-muted-dark);
+    }
+</style>
+
+<div class="dtr-shell">
+    <div class="dtr-top-bar">
+        <h1 class="dtr-title">Daily Time Record</h1>
+        <a asp-controller="Home" asp-action="Logout" class="btn-logoff">Log-off</a>
+    </div>
+
+    <form id="dtrForm" asp-action="Index" method="post" class="dtr-selector-wrap">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Code" />
+
+        <select asp-for="SelectedDtrId"
+                asp-items="Model.DtrOptions"
+                onchange="submitDtrForm()"
+                aria-label="DTR Period"
+                class="dtr-select-dark">
+        </select>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="dtr-alert-warn" role="alert">
+            @Model.ErrorMessage
+        </div>
+    }
+
+    @if (Model.Records.Any())
+    {
+        var header = Model.Records.First();
+        var totalRegular = Model.Records.Sum(r => r.RegularHours);
+        var totalNight = Model.Records.Sum(r => r.NightHours);
+        var totalOT = Model.Records.Sum(r => r.OvertimeHours);
+        var totalOTNight = Model.Records.Sum(r => r.OvertimeNightHours);
+        var totalGross = Model.Records.Sum(r => r.GrossTotalHours);
+        var totalLate = Model.Records.Sum(r => r.TardyLateHours);
+        var totalUndertime = Model.Records.Sum(r => r.TardyUndertimeHours);
+        var totalNet = Model.Records.Sum(r => r.NetTotalHours);
+
+        var totalNetDays = totalNet / 8m;
+
+        <div class="dtr-hero-card">
+            <div class="dtr-hero-top">
+                <span class="dtr-hero-label">Net Total Hours</span>
+                <span class="dtr-badge">@(header.DTRNumber ?? header.DTRId.ToString())</span>
+            </div>
+
+            <div class="dtr-hero-hours">@totalNet.ToString("N2") hrs</div>
+            <div style="font-size: 0.85rem; font-weight: 600; color: rgba(255, 255, 255, 0.92); margin-top: -0.55rem; margin-bottom: 0.85rem; font-variant-numeric: tabular-nums;">
+                @totalNetDays.ToString("N2") @(Math.Abs(totalNetDays - 1m) < 0.005m ? "day" : "days") <span style="font-weight: 400; font-size: 0.75rem; opacity: 0.85;">(8 hrs = 1 day)</span>
+            </div>
+
+            <hr class="dtr-hero-divider" />
+
+            <div class="dtr-emp-name">@header.FullName</div>
+            <div class="dtr-emp-sub">@header.Department • @header.Position</div>
+            <div class="dtr-emp-meta">
+                <span>@(header.DateStart ?? "N/A") - @(header.DateEnd ?? "N/A")</span>
+                <span>•</span>
+                <span>Code: @Model.Code</span>
+            </div>
+        </div>
+
+        @*  <div class="dtr-section-heading">Hours Summary</div>
+        <div class="dtr-summary-card">
+            <div class="dtr-summary-row">
+                <span>Regular Hours</span>
+                <span class="dtr-summary-val">@totalRegular.ToString("N2")</span>
+            </div>
+            <div class="dtr-summary-row">
+                <span>Night Hours</span>
+                <span class="dtr-summary-val">@totalNight.ToString("N2")</span>
+            </div>
+            <div class="dtr-summary-row">
+                <span>Overtime Hours</span>
+                <span class="dtr-summary-val">@totalOT.ToString("N2")</span>
+            </div>
+            <div class="dtr-summary-row">
+                <span>Overtime Night Hours</span>
+                <span class="dtr-summary-val">@totalOTNight.ToString("N2")</span>
+            </div>
+            <div class="dtr-summary-row">
+                <span>Gross Total Hours</span>
+                <span class="dtr-summary-val">@totalGross.ToString("N2")</span>
+            </div>
+            <div class="dtr-summary-row">
+                <span>Tardy Late Hours</span>
+                <span class="dtr-summary-val warn">@totalLate.ToString("N2")</span>
+            </div>
+            <div class="dtr-summary-row">
+                <span>Tardy Undertime Hours</span>
+                <span class="dtr-summary-val warn">@totalUndertime.ToString("N2")</span>
+            </div>
+            <div class="dtr-summary-row total-row">
+                <span>Net Total Hours</span>
+                <span class="dtr-summary-val accent">@totalNet.ToString("N2")</span>
+            </div>
+        </div> *@
+
+        <div class="dtr-section-heading">Daily Logs (@Model.Records.Count)</div>
+        <div class="dtr-entry-list">
+            @foreach (var row in Model.Records)
+            {
+                var parsedOk = DateTime.TryParse(row.Date, out var parsedDate);
+                var dayName = parsedOk ? parsedDate.ToString("dddd") : string.Empty;
+                var cardStateClass = row.Absent ? "is-absent" : (row.RestDay ? "is-restday" : string.Empty);
+                var hasOvertime = row.OvertimeHours > 0 || row.OvertimeNightHours > 0;
+
+                <div class="dtr-day-card @cardStateClass">
+                    <div class="dtr-day-header">
+                        <div class="dtr-date-group">
+                            <span class="dtr-date-text">@(row.Date ?? "-")</span>
+                            @if (!string.IsNullOrWhiteSpace(dayName))
+                            {
+                                <span class="dtr-weekday-pill">@dayName</span>
+                            }
+                        </div>
+
+                        <div class="dtr-tags">
+                            @if (!string.IsNullOrWhiteSpace(row.DayType))
+                            {
+                                <span class="dtr-tag">@row.DayType</span>
+                            }
+                            @if (row.RestDay)
+                            {
+                                <span class="dtr-tag rest">Rest Day</span>
+                            }
+                            @if (row.OfficialBusiness)
+                            {
+                                <span class="dtr-tag ob">Official Business</span>
+                            }
+                            @if (row.OnLeave)
+                            {
+                                <span class="dtr-tag leave">On Leave</span>
+                            }
+                            @if (row.Absent)
+                            {
+                                <span class="dtr-tag absent">Absent</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="dtr-times-grid">
+                        <div class="dtr-time-slot">
+                            <div class="dtr-slot-label">Time In 1</div>
+                            <div class="dtr-slot-val">@(string.IsNullOrWhiteSpace(row.TimeIn1) ? "-" : row.TimeIn1)</div>
+                        </div>
+                        <div class="dtr-time-slot">
+                            <div class="dtr-slot-label">Time Out 1</div>
+                            <div class="dtr-slot-val">@(string.IsNullOrWhiteSpace(row.TimeOut1) ? "-" : row.TimeOut1)</div>
+                        </div>
+                        <div class="dtr-time-slot">
+                            <div class="dtr-slot-label">Time In 2</div>
+                            <div class="dtr-slot-val">@(string.IsNullOrWhiteSpace(row.TimeIn2) ? "-" : row.TimeIn2)</div>
+                        </div>
+                        <div class="dtr-time-slot">
+                            <div class="dtr-slot-label">Time Out 2</div>
+                            <div class="dtr-slot-val">@(string.IsNullOrWhiteSpace(row.TimeOut2) ? "-" : row.TimeOut2)</div>
+                        </div>
+                    </div>
+
+                    <div class="dtr-metrics-bar">
+                        <span class="dtr-metric-chip">Reg: <strong>@row.RegularHours.ToString("N2")</strong></span>
+                        <span class="dtr-metric-chip">Night: <strong>@row.NightHours.ToString("N2")</strong></span>
+                        <span class="dtr-metric-chip @(hasOvertime ? "ot-chip" : string.Empty)">OT: <strong>@row.OvertimeHours.ToString("N2")</strong></span>
+                        <span class="dtr-metric-chip @(hasOvertime ? "ot-chip" : string.Empty)">OT Night: <strong>@row.OvertimeNightHours.ToString("N2")</strong></span>
+                        <span class="dtr-metric-chip">Late: <strong>@row.TardyLateHours.ToString("N2")</strong></span>
+                        <span class="dtr-metric-chip">UT: <strong>@row.TardyUndertimeHours.ToString("N2")</strong></span>
+                        <span class="dtr-metric-chip net-chip">Net: <strong>@row.NetTotalHours.ToString("N2")</strong></span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(header.Remarks))
+        {
+            <div class="dtr-remarks-box">
+                <strong>Remarks:</strong> @header.Remarks
+            </div>
+        }
+    }
+</div>
+
+<script>
+    function submitDtrForm() {
+        const form = document.getElementById('dtrForm');
+        const select = document.getElementById('SelectedDtrId');
+        if (select) {
+            select.disabled = true;
+        }
+        if (form) {
+            form.submit();
+        }
+    }
+</script>

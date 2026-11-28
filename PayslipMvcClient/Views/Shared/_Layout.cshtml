@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@{
+    var isLoggedIn = !string.IsNullOrWhiteSpace(Context.Session.GetString("MobileCode"));
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -216,6 +220,7 @@
         .sidebar-link {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 0.65rem;
             padding: 0.7rem 0.85rem;
             border-radius: 0.7rem;
@@ -226,10 +231,32 @@
             transition: background-color 0.15s ease, color 0.15s ease;
         }
 
-            .sidebar-link:hover {
+            .sidebar-link:hover:not(.disabled-link) {
                 background-color: rgba(16, 185, 129, 0.12);
                 color: var(--accent-emerald-soft);
             }
+
+            .sidebar-link.disabled-link {
+                color: #6b7280;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+        .soon-tag {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 0.15rem 0.45rem;
+            border-radius: 999px;
+            background-color: rgba(255, 255, 255, 0.06);
+            color: #9ca3af;
+        }
+
+        .sidebar-divider {
+            border: 0;
+            border-top: 1px solid var(--border-dark);
+            margin: 0.5rem 0;
+        }
 
         .sidebar-footer {
             margin-top: auto;
@@ -274,21 +301,42 @@
         </div>
 
         <ul class="sidebar-nav">
-            <li>
-                <a class="sidebar-link" asp-area="" asp-controller="Payslip" asp-action="Index" onclick="toggleSidebar(false)">
-                    <span>Payslip</span>
-                </a>
-            </li>
-            <li>
-                <a class="sidebar-link" asp-area="" asp-controller="Home" asp-action="Index" onclick="toggleSidebar(false)">
-                    <span>Daily Time Record</span>
-                </a>
-            </li>
-            <li>
-                <a class="sidebar-link" asp-area="" asp-controller="Home" asp-action="Index" onclick="toggleSidebar(false)">
-                    <span>Memo</span>
-                </a>
-            </li>
+            @if (isLoggedIn)
+            {
+                <li>
+                    <a class="sidebar-link" asp-area="" asp-controller="Payslip" asp-action="Index" onclick="toggleSidebar(false)">
+                        <span>Payslip</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="sidebar-link" asp-area="" asp-controller="Dtr" asp-action="Index" onclick="toggleSidebar(false)">
+                        <span>Daily Time Record</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="sidebar-link" asp-area="" asp-controller="Memo" asp-action="Index" onclick="toggleSidebar(false)">
+                        <span>Memo</span>
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li>
+                    <a class="sidebar-link" asp-area="" asp-controller="Home" asp-action="Index" onclick="toggleSidebar(false)">
+                        <span>Mobile Code Login</span>
+                    </a>
+                </li>
+            }
+
+            @if (isLoggedIn)
+            {
+                <li><hr class="sidebar-divider" /></li>
+                <li>
+                    <a class="sidebar-link" asp-area="" asp-controller="Home" asp-action="Logout" onclick="toggleSidebar(false)">
+                        <span>Log-off</span>
+                    </a>
+                </li>
+            }
         </ul>
 
         <div class="sidebar-footer">
